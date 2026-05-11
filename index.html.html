@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalFlow Digital — Local Growth, Made Simple</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --navy:#0a1628;
+    --navy2:#112240;
+    --teal:#0ef0b8;
+    --teal2:#00c99a;
+    --teal-dim:#0ef0b822;
+    --teal-mid:#0ef0b844;
+    --white:#f5f9f7;
+    --muted:#8fa3b1;
+    --card:#111e34;
+    --card2:#162037;
+    --border:#1e3050;
+    --accent:#ff6b35;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--navy);
+    color:var(--white);
+    overflow-x:hidden;
+    line-height:1.6;
+  }
+  h1,h2,h3,h4{font-family:'Syne',sans-serif;line-height:1.15}
+
+  /* NAV */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.1rem 5vw;
+    background:rgba(10,22,40,0.88);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .logo{
+    font-family:'Syne',sans-serif;
+    font-weight:800;font-size:1.35rem;
+    color:var(--white);text-decoration:none;
+    display:flex;align-items:center;gap:8px;
+  }
+  .logo-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 12px var(--teal);
+    display:inline-block;
+  }
+  .nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
+  .nav-links a{
+    color:var(--muted);text-decoration:none;
+    font-size:.9rem;font-weight:500;
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--white)}
+  .nav-cta{
+    background:var(--teal);color:var(--navy);
+    padding:.55rem 1.4rem;border-radius:6px;
+    font-family:'Syne',sans-serif;font-weight:700;
+    font-size:.85rem;text-decoration:none;
+    transition:all .2s;white-space:nowrap;
+  }
+  .nav-cta:hover{background:#2fffc5;transform:translateY(-1px)}
+
+  /* HERO */
+  .hero{
+    min-height:100vh;
+    display:flex;align-items:center;
+    padding:8rem 5vw 5rem;
+    position:relative;overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse 70% 60% at 60% 40%,#0d2a4a 0%,var(--navy) 70%);
+  }
+  .hero-grid{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(var(--border) 1px,transparent 1px),
+      linear-gradient(90deg,var(--border) 1px,transparent 1px);
+    background-size:60px 60px;
+    opacity:.35;
+  }
+  .hero-glow{
+    position:absolute;
+    width:500px;height:500px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(14,240,184,.12) 0%,transparent 70%);
+    top:10%;right:5%;
+    animation:pulse 5s ease-in-out infinite alternate;
+  }
+  @keyframes pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.15);opacity:1}}
+  .hero-content{position:relative;z-index:2;max-width:680px}
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--teal-dim);border:1px solid var(--teal-mid);
+    color:var(--teal);padding:.45rem 1rem;border-radius:100px;
+    font-size:.8rem;font-weight:500;margin-bottom:1.8rem;
+    animation:fadeIn .8s ease both;
+  }
+  .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:blink 2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  h1.hero-title{
+    font-size:clamp(2.8rem,6vw,5rem);
+    font-weight:800;
+    line-height:1.08;
+    margin-bottom:1.5rem;
+    animation:fadeIn .9s .1s ease both;
+  }
+  h1.hero-title span{color:var(--teal)}
+  .hero-sub{
+    font-size:1.15rem;color:var(--muted);
+    max-width:520px;margin-bottom:2.5rem;font-weight:300;
+    animation:fadeIn .9s .2s ease both;
+  }
+  .hero-actions{
+    display:flex;gap:1rem;flex-wrap:wrap;
+    animation:fadeIn .9s .3s ease both;
+  }
+  .btn-primary{
+    background:var(--teal);color:var(--navy);
+    padding:.85rem 2rem;border-radius:8px;
+    font-family:'Syne',sans-serif;font-weight:700;
+    font-size:1rem;text-decoration:none;
+    transition:all .2s;border:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary:hover{background:#2fffc5;transform:translateY(-2px);box-shadow:0 8px 30px rgba(14,240,184,.25)}
+  .btn-outline{
+    background:transparent;color:var(--white);
+    padding:.85rem 2rem;border-radius:8px;
+    font-family:'Syne',sans-serif;font-weight:600;
+    font-size:1rem;text-decoration:none;
+    border:1px solid var(--border);
+    transition:all .2s;cursor:pointer;
+  }
+  .btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+  .hero-stats{
+    display:flex;gap:3rem;margin-top:4rem;flex-wrap:wrap;
+    animation:fadeIn .9s .4s ease both;
+  }
+  .stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--teal)}
+  .stat-label{font-size:.82rem;color:var(--muted);margin-top:.2rem}
+
+  /* LOGOS */
+  .logos-strip{
+    padding:2.5rem 5vw;
+    border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    text-align:center;
+  }
+  .logos-label{
+    font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;
+    color:var(--muted);margin-bottom:1.5rem;
+  }
+  .logos-row{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:2.5rem 3.5rem;
+    align-items:center;
+  }
+  .logo-item{
+    color:#3a5270;font-family:'Syne',sans-serif;
+    font-size:.95rem;font-weight:700;letter-spacing:.04em;
+  }
+
+  /* SECTIONS */
+  section{padding:6rem 5vw}
+  .section-label{
+    display:inline-block;
+    font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;
+    color:var(--teal);margin-bottom:.9rem;font-weight:600;
+  }
+  h2.section-title{
+    font-size:clamp(1.9rem,4vw,3rem);
+    font-weight:800;margin-bottom:1rem;
+  }
+  h2.section-title span{color:var(--teal)}
+  .section-sub{
+    font-size:1.05rem;color:var(--muted);
+    max-width:540px;font-weight:300;margin-bottom:3.5rem;
+  }
+
+  /* SERVICES */
+  #services{background:var(--navy2)}
+  .services-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:1.5rem;
+  }
+  .service-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;padding:2rem;
+    transition:all .25s;position:relative;overflow:hidden;
+  }
+  .service-card::before{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,var(--teal-dim) 0%,transparent 60%);
+    opacity:0;transition:opacity .3s;
+  }
+  .service-card:hover{border-color:var(--teal-mid);transform:translateY(-4px)}
+  .service-card:hover::before{opacity:1}
+  .service-icon{
+    width:48px;height:48px;border-radius:10px;
+    background:var(--teal-dim);border:1px solid var(--teal-mid);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:1.2rem;font-size:1.4rem;
+  }
+  .service-card h3{
+    font-size:1.2rem;font-weight:700;margin-bottom:.6rem;
+  }
+  .service-card p{font-size:.9rem;color:var(--muted);line-height:1.65}
+  .service-tag{
+    display:inline-block;
+    background:var(--teal-dim);border:1px solid var(--teal-mid);
+    color:var(--teal);font-size:.72rem;
+    padding:.25rem .7rem;border-radius:100px;margin-top:1rem;
+  }
+
+  /* HOW IT WORKS */
+  .steps{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:2rem;position:relative;
+  }
+  .step{position:relative;padding:2rem;text-align:center}
+  .step-num{
+    width:52px;height:52px;border-radius:50%;
+    border:2px solid var(--teal);
+    background:var(--teal-dim);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+    color:var(--teal);margin:0 auto 1.2rem;
+  }
+  .step h3{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
+  .step p{font-size:.88rem;color:var(--muted);line-height:1.65}
+
+  /* BEFORE/AFTER */
+  #results{background:var(--navy2)}
+  .before-after{
+    display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;
+    margin-bottom:3rem;
+  }
+  @media(max-width:640px){.before-after{grid-template-columns:1fr}}
+  .ba-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem}
+  .ba-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+    font-weight:700;margin-bottom:1.2rem;display:flex;align-items:center;gap:6px;
+  }
+  .ba-label.before{color:#e05b5b}
+  .ba-label.after{color:var(--teal)}
+  .ba-item{
+    display:flex;align-items:center;gap:10px;
+    font-size:.9rem;color:var(--muted);margin-bottom:.75rem;
+  }
+  .ba-item svg{flex-shrink:0}
+  .results-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:1.2rem;
+  }
+  .result-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:1.5rem;text-align:center;
+  }
+  .result-num{
+    font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;
+    color:var(--teal);display:block;
+  }
+  .result-label{font-size:.82rem;color:var(--muted);margin-top:.3rem}
+
+  /* PRICING */
+  .pricing-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1.5rem;align-items:start;
+  }
+  .price-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:2rem;transition:all .25s;
+  }
+  .price-card.featured{
+    border-color:var(--teal);
+    background:var(--card2);
+    position:relative;
+  }
+  .price-card.featured::after{
+    content:'Most Popular';
+    position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+    background:var(--teal);color:var(--navy);
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;
+    padding:.3rem .9rem;border-radius:100px;white-space:nowrap;
+  }
+  .price-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.5rem;color:var(--muted)}
+  .price-amount{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--white)}
+  .price-amount span{font-size:1rem;color:var(--muted);font-weight:400}
+  .price-desc{font-size:.85rem;color:var(--muted);margin:.5rem 0 1.5rem}
+  .price-features{list-style:none;margin-bottom:2rem}
+  .price-features li{
+    font-size:.88rem;color:var(--muted);
+    padding:.45rem 0;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:8px;
+  }
+  .check{color:var(--teal);font-size:1rem;flex-shrink:0}
+  .price-btn{
+    width:100%;padding:.85rem;border-radius:8px;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;
+    cursor:pointer;transition:all .2s;text-align:center;
+    display:block;text-decoration:none;
+  }
+  .price-btn-outline{
+    background:transparent;color:var(--white);
+    border:1px solid var(--border);
+  }
+  .price-btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+  .price-btn-solid{
+    background:var(--teal);color:var(--navy);border:none;
+  }
+  .price-btn-solid:hover{background:#2fffc5;transform:translateY(-1px)}
+
+  /* TESTIMONIALS */
+  #testimonials{background:var(--navy2)}
+  .testimonials-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:1.5rem;
+  }
+  .testi-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:2rem;
+  }
+  .stars{color:var(--teal);font-size:1rem;margin-bottom:1rem;letter-spacing:2px}
+  .testi-text{font-size:.92rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;font-style:italic}
+  .testi-author{display:flex;align-items:center;gap:12px}
+  .testi-avatar{
+    width:40px;height:40px;border-radius:50%;
+    background:var(--teal-dim);border:1px solid var(--teal-mid);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--teal);
+    flex-shrink:0;
+  }
+  .testi-name{font-weight:600;font-size:.9rem}
+  .testi-biz{font-size:.78rem;color:var(--muted)}
+
+  /* CTA */
+  .cta-section{
+    text-align:center;padding:7rem 5vw;
+    background:linear-gradient(135deg,var(--navy2) 0%,var(--navy) 100%);
+    position:relative;overflow:hidden;
+  }
+  .cta-glow{
+    position:absolute;
+    width:600px;height:300px;
+    background:radial-gradient(ellipse,rgba(14,240,184,.08) 0%,transparent 70%);
+    top:50%;left:50%;transform:translate(-50%,-50%);
+  }
+  .cta-section h2{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:1rem}
+  .cta-section p{font-size:1.1rem;color:var(--muted);margin-bottom:2.5rem;font-weight:300}
+
+  /* CONTACT */
+  .contact-wrap{
+    display:grid;grid-template-columns:1fr 1.2fr;gap:4rem;align-items:start;
+  }
+  @media(max-width:768px){.contact-wrap{grid-template-columns:1fr}}
+  .contact-info h3{font-size:1.4rem;font-weight:700;margin-bottom:.8rem}
+  .contact-info p{color:var(--muted);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+  .contact-item{
+    display:flex;align-items:center;gap:12px;
+    color:var(--muted);font-size:.9rem;margin-bottom:1rem;
+  }
+  .contact-icon{
+    width:36px;height:36px;border-radius:8px;
+    background:var(--teal-dim);border:1px solid var(--teal-mid);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;font-size:1rem;
+  }
+  .form-wrap{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:2.5rem;
+  }
+  .form-row{display:flex;gap:1rem}
+  @media(max-width:480px){.form-row{flex-direction:column}}
+  .form-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem;flex:1}
+  label{font-size:.82rem;color:var(--muted);font-weight:500}
+  input,select,textarea{
+    background:#0d1e36;border:1px solid var(--border);
+    color:var(--white);padding:.75rem 1rem;border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:.9rem;
+    outline:none;transition:border-color .2s;
+    width:100%;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+  textarea{resize:vertical;min-height:120px}
+  select option{background:var(--navy2)}
+
+  /* FOOTER */
+  footer{
+    background:var(--navy);border-top:1px solid var(--border);
+    padding:3rem 5vw 2rem;
+  }
+  .footer-grid{
+    display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;
+    margin-bottom:3rem;
+  }
+  @media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:480px){.footer-grid{grid-template-columns:1fr}}
+  .footer-brand p{font-size:.88rem;color:var(--muted);margin-top:.8rem;line-height:1.7;max-width:240px}
+  .footer-col h4{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.08em}
+  .footer-col ul{list-style:none}
+  .footer-col li{margin-bottom:.6rem}
+  .footer-col a{color:var(--muted);text-decoration:none;font-size:.88rem;transition:color .2s}
+  .footer-col a:hover{color:var(--teal)}
+  .footer-bottom{
+    border-top:1px solid var(--border);padding-top:1.5rem;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+  }
+  .footer-bottom p{font-size:.8rem;color:var(--muted)}
+  .footer-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--teal-dim);border:1px solid var(--teal-mid);
+    color:var(--teal);padding:.3rem .8rem;border-radius:100px;font-size:.75rem;
+  }
+
+  /* MOBILE */
+  @media(max-width:768px){
+    .nav-links{display:none}
+    .hero{padding:7rem 5vw 4rem}
+    .hero-stats{gap:2rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo"><span class="logo-dot"></span>LocalFlow Digital</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get Free Mockup</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Serving Small Towns &amp; Local Markets
+    </div>
+    <h1 class="hero-title">Your Business Deserves to<br><span>Be Found Online.</span></h1>
+    <p class="hero-sub">We build modern websites, boost your Google ranking, and drive real customers to your door — all at a price that actually makes sense for local businesses.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">
+        Get Your Free Website Mockup
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+      </a>
+      <a href="#services" class="btn-outline">See Our Services</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">200+</div>
+        <div class="stat-label">Local Businesses Helped</div>
+      </div>
+      <div>
+        <div class="stat-num">3x</div>
+        <div class="stat-label">Average Call Increase</div>
+      </div>
+      <div>
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Client Retention Rate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos-strip">
+  <div class="logos-label">Trusted by local businesses across industries</div>
+  <div class="logos-row">
+    <span class="logo-item">🍕 Restaurants</span>
+    <span class="logo-item">✂️ Barbershops</span>
+    <span class="logo-item">🔧 Plumbers</span>
+    <span class="logo-item">🏠 Roofers</span>
+    <span class="logo-item">💅 Salons</span>
+    <span class="logo-item">🌿 Landscapers</span>
+    <span class="logo-item">🚗 Auto Repair</span>
+    <span class="logo-item">🏋️ Gyms</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">What We Do</div>
+  <h2 class="section-title">Everything You Need to <span>Grow Locally</span></h2>
+  <p class="section-sub">From your first website to a full digital presence — we handle it all so you can focus on running your business.</p>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">🌐</div>
+      <h3>Website Design & Build</h3>
+      <p>Fast, mobile-first websites that look great and convert visitors into paying customers. No templates — every site is built for your business.</p>
+      <span class="service-tag">Core Service</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📍</div>
+      <h3>Google Business Optimization</h3>
+      <p>We optimize your Google Business Profile so locals find you first when searching. More reviews, better photos, stronger ranking.</p>
+      <span class="service-tag">High Impact</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🔍</div>
+      <h3>Local SEO</h3>
+      <p>Rank higher in your city's search results. We target the keywords your customers actually use to find businesses like yours.</p>
+      <span class="service-tag">Long-Term Growth</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🤖</div>
+      <h3>AI-Powered Automation</h3>
+      <p>Automated follow-up texts, review requests, and lead capture systems that work 24/7 — even when you're busy on the job.</p>
+      <span class="service-tag">New</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📱</div>
+      <h3>Monthly Website Care</h3>
+      <p>Ongoing hosting, updates, security, and support. Your site stays fast, secure, and up-to-date — with a real person you can call.</p>
+      <span class="service-tag">Recurring</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📊</div>
+      <h3>Reporting & Growth Tracking</h3>
+      <p>Clear monthly reports showing calls, clicks, and rankings — so you always know exactly what your investment is doing.</p>
+      <span class="service-tag">Included</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" style="background:var(--navy2)">
+  <div class="section-label">The Process</div>
+  <h2 class="section-title">Up &amp; Running in <span>Days, Not Months</span></h2>
+  <p class="section-sub">A simple, low-risk process that gets your business online fast — with zero hassle on your end.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Free Mockup</h3>
+      <p>We build a custom homepage mockup for your business — no commitment, no cost. You see exactly what you're getting before spending a dime.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Quick Call</h3>
+      <p>A short 20-minute call to confirm your goals, gather photos, and finalize your site content. That's all we need from you.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>We Build It</h3>
+      <p>Your full website, Google profile, and lead systems are set up within 7 business days. Fast, professional, done right.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>You Start Growing</h3>
+      <p>More calls, more bookings, and better visibility — backed by monthly reporting and a team that's always in your corner.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="section-label">Real Results</div>
+  <h2 class="section-title">Before &amp; After <span>LocalFlow</span></h2>
+  <p class="section-sub">See what changes when a local business goes from invisible to impossible to ignore online.</p>
+  <div class="before-after">
+    <div class="ba-card">
+      <div class="ba-label before">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#e05b5b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M8 12h8"/></svg>
+        Before LocalFlow
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#e05b5b" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        No website or outdated page
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#e05b5b" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        Invisible on Google Search
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#e05b5b" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        Losing customers to competitors
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#e05b5b" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        No way to collect reviews
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#e05b5b" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        Manually chasing every lead
+      </div>
+    </div>
+    <div class="ba-card">
+      <div class="ba-label after">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#0ef0b8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M8 12l3 3 5-5"/></svg>
+        After LocalFlow
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0ef0b8" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Professional mobile-ready website
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0ef0b8" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Ranking in Google's local results
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0ef0b8" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        More calls, walk-ins, and bookings
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0ef0b8" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Automated review collection system
+      </div>
+      <div class="ba-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0ef0b8" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Leads captured automatically 24/7
+      </div>
+    </div>
+  </div>
+  <div class="results-grid">
+    <div class="result-card"><span class="result-num">+312%</span><div class="result-label">Avg. Google Search Impressions</div></div>
+    <div class="result-card"><span class="result-num">+187%</span><div class="result-label">Increase in Calls & Messages</div></div>
+    <div class="result-card"><span class="result-num">4.8★</span><div class="result-label">Average Google Rating (Clients)</div></div>
+    <div class="result-card"><span class="result-num">7 Days</span><div class="result-label">Average Time to Launch</div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Honest Pricing, <span>No Surprises</span></h2>
+  <p class="section-sub">Simple monthly plans built for local businesses — not Fortune 500 companies. Cancel anytime.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Starter</div>
+      <div class="price-amount">$97<span>/month</span></div>
+      <div class="price-desc">Perfect for businesses just getting started online.</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span>5-Page Website</li>
+        <li><span class="check">✓</span>Mobile Optimized</li>
+        <li><span class="check">✓</span>Google Business Setup</li>
+        <li><span class="check">✓</span>Basic SEO</li>
+        <li><span class="check">✓</span>Hosting & SSL Included</li>
+        <li><span class="check">✓</span>Monthly Check-in</li>
+      </ul>
+      <a href="#contact" class="price-btn price-btn-outline">Get Started</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-name">Growth</div>
+      <div class="price-amount">$197<span>/month</span></div>
+      <div class="price-desc">Our most popular plan for businesses ready to dominate locally.</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span>10-Page Custom Website</li>
+        <li><span class="check">✓</span>Advanced Local SEO</li>
+        <li><span class="check">✓</span>Google Business Management</li>
+        <li><span class="check">✓</span>Review Automation System</li>
+        <li><span class="check">✓</span>Lead Capture Forms</li>
+        <li><span class="check">✓</span>Monthly Growth Report</li>
+        <li><span class="check">✓</span>Priority Support</li>
+      </ul>
+      <a href="#contact" class="price-btn price-btn-solid">Get Started</a>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Pro</div>
+      <div class="price-amount">$347<span>/month</span></div>
+      <div class="price-desc">Full-stack digital presence for businesses serious about growth.</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span>Unlimited Pages</li>
+        <li><span class="check">✓</span>AI Chat + Automation</li>
+        <li><span class="check">✓</span>Full SEO Campaign</li>
+        <li><span class="check">✓</span>Social Media Setup</li>
+        <li><span class="check">✓</span>Competitor Analysis</li>
+        <li><span class="check">✓</span>Bi-Weekly Strategy Call</li>
+        <li><span class="check">✓</span>Dedicated Account Manager</li>
+      </ul>
+      <a href="#contact" class="price-btn price-btn-outline">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-label">Client Stories</div>
+  <h2 class="section-title">What Local Business Owners <span>Are Saying</span></h2>
+  <p class="section-sub">Real results from real businesses just like yours.</p>
+  <div class="testimonials-grid">
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Before LocalFlow, we had nothing online. Now we get 4–5 calls a week just from Google. Best investment I've made for the shop in years."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">MR</div>
+        <div>
+          <div class="testi-name">Mike R.</div>
+          <div class="testi-biz">Mike's Auto Repair, Shelbyville KY</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"They made us a free mockup and we were hooked. Within two weeks we had a beautiful website, 40 new Google reviews, and our phone was ringing."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">JL</div>
+        <div>
+          <div class="testi-name">Jessica L.</div>
+          <div class="testi-biz">Lavender Day Spa, Bardstown KY</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"I was skeptical about spending money online. LocalFlow showed me exactly what I'd get before I paid anything. Now I wish I'd done it two years ago."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">DT</div>
+        <div>
+          <div class="testi-name">Dave T.</div>
+          <div class="testi-biz">Tri-County Roofing, Lebanon KY</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-section">
+  <div class="cta-glow"></div>
+  <div style="position:relative;z-index:2">
+    <div class="section-label">Limited Spots Available</div>
+    <h2>Ready to Get Found<br>by Local Customers?</h2>
+    <p>We'll build you a free homepage mockup — no strings attached.<br>See exactly what your business could look like online before spending a cent.</p>
+    <a href="#contact" class="btn-primary" style="display:inline-flex">
+      Claim Your Free Mockup
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Get In Touch</div>
+  <h2 class="section-title">Let's Get Your Business <span>Online</span></h2>
+  <p class="section-sub">Fill out the form and we'll reach out within 24 hours with your free mockup plan.</p>
+  <div class="contact-wrap">
+    <div class="contact-info">
+      <h3>We'd Love to Help</h3>
+      <p>Whether you're starting from scratch, updating an old site, or just want more customers finding you on Google — we've got a plan that fits your budget and goals.</p>
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        hello@localflowdigital.com
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        (502) 555-0198
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        Serving Small Towns Across Kentucky &amp; Beyond
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">⚡</div>
+        Free mockup ready within 48 hours
+      </div>
+    </div>
+    <div class="form-wrap">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name</label>
+          <input type="text" id="fname" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label for="lname">Last Name</label>
+          <input type="text" id="lname" placeholder="Smith">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="biz">Business Name</label>
+        <input type="text" id="biz" placeholder="Smith's Plumbing">
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="john@smithplumbing.com">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="(502) 555-0100">
+      </div>
+      <div class="form-group">
+        <label for="service">What Do You Need?</label>
+        <select id="service">
+          <option value="">Select a service...</option>
+          <option>New Website</option>
+          <option>Website Redesign</option>
+          <option>Google Business Optimization</option>
+          <option>Local SEO</option>
+          <option>Full Growth Package</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="msg">Anything else we should know?</label>
+        <textarea id="msg" placeholder="Tell us about your business and what you're hoping to achieve..."></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="handleSubmit()">
+        Send My Request &amp; Get Free Mockup
+      </button>
+      <p style="font-size:.78rem;color:var(--muted);text-align:center;margin-top:.8rem">No commitment required. We'll reach out within 24 hours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo"><span class="logo-dot"></span>LocalFlow Digital</a>
+      <p>Helping small-town businesses get found, grow online, and compete with the big guys — without the big agency price tag.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services">Website Design</a></li>
+        <li><a href="#services">Local SEO</a></li>
+        <li><a href="#services">Google Business</a></li>
+        <li><a href="#services">AI Automation</a></li>
+        <li><a href="#services">Monthly Care</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:hello@localflowdigital.com">Email Us</a></li>
+        <li><a href="tel:5025550198">Call Us</a></li>
+        <li><a href="#contact">Free Mockup</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 LocalFlow Digital. All rights reserved.</p>
+    <span class="footer-badge">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block"></span>
+      Serving Local Businesses Everywhere
+    </span>
+  </div>
+</footer>
+
+<script>
+function handleSubmit(){
+  const biz=document.getElementById('biz').value.trim();
+  const email=document.getElementById('email').value.trim();
+  if(!biz||!email){
+    alert('Please fill in at least your business name and email.');
+    return;
+  }
+  const btn=document.querySelector('.form-wrap .btn-primary');
+  btn.textContent='✓ Request Sent! We\'ll be in touch within 24 hours.';
+  btn.style.background='#0d9b6e';
+  btn.style.pointerEvents='none';
+}
+// Smooth scroll for nav
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href');
+    if(id==='#')return;
+    const el=document.querySelector(id);
+    if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+// Fade in on scroll
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='none'}});
+},{threshold:.1});
+document.querySelectorAll('.service-card,.step,.testi-card,.result-card,.price-card').forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(20px)';
+  el.style.transition='opacity .5s ease,transform .5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
